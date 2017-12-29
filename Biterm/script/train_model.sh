@@ -1,6 +1,6 @@
 #!/bin/bash
 # run an toy example for BTM
-for K in $(seq 2 4)
+for K in $(seq 25 30)
 do
     alpha=`echo "scale=3;1/$K"|bc`
     beta=0.01
@@ -15,7 +15,7 @@ do
 
     # the input docs for training
     doc_pt=${input_dir}hpv_tweets.txt
-
+    # doc_pt=${input_dir}lda_BTM_comparison_traning_data.txt
     echo "=============== Index Docs ============="
     # docs after indexing
     dwid_pt=${output_dir}doc_wids.txt

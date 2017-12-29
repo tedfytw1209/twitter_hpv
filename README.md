@@ -55,14 +55,11 @@ Our data sets are saved on s3 (`s3://ji0ng.bi0n.twitter/hpv/`) collected from 3 
 ### Topic modeling
 * sample size for comparison between LDA and BTM: 15835
     * H_score:
-      * BTM: inter: 0.248297, intra: 0.476651 (0.52092)
-      * LDA: inter: 0.3462722 , intra: 0.458076 （0.75593）
+      * BTM: inter: 0.481031355146
+      * LDA: inter: 0.781761511916
 
 * lda.py: This code serves two functions:
     * 1: Test different statistical model (Arun2010, CaoJuan2009, Deveaud2014)
     * 2: Train LDA model and visulize the results as word clouds
     * 3: Assign topics to tweets
 
-### analysis
-
-* stat_v2.py: count tweets volume by state. ( './intermediate_data/analysis/tweets_per_state.csv' )

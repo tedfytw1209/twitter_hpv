@@ -30,49 +30,54 @@ import multiprocessing as mp
 pattern=r'[A-Z]\.+\S+|\w+\-\w+|\w+'
 
 
-def load_stoplist():
-    stoplist = set()
-    with open('./english.stop.txt', newline='', encoding='utf-8') as f:
-        for line in f:
-            stoplist.add(line.strip())
-    return stoplist
+# def load_stoplist():
+#     stoplist = set()
+#     with open('./english.stop.txt', newline='', encoding='utf-8') as f:
+#         for line in f:
+#             stoplist.add(line.strip())
+#     return stoplist
 
 
 def group_tweets_by_cluster_gold_standard(source, k):
     tweets = []
     all_tweets_in_cluster = []
-    stoplist = load_stoplist()
     wordnet_lemmatizer = WordNetLemmatizer()
-    with open(source) as txt_file:
-        tweets = json.load(txt_file)
+    
+    # read all tweets
+    df = pd.read_csv(source,encoding='utf-8')
+    for index, row in df.iterrows():
+        tweets.append(row['text'])
+
     hashtags = []
     with open('./intermediate_data/cluster_hashtags.json', 'r') as json_file:
         hashtags = json.load(json_file)
     for i in range(k):
         # with open('./BTM/output/' + str(k) + 'tp/clusters/' + str(i) + 'tp.txt', 'w') as clusters:
-        with open('./intermediate_data/LDA_BTM_comparison/clusters/' + str(i) + 'tp.txt', 'w') as clusters:
+        with open('./intermediate_data/LDA_BTM_comparison/clusters/' + str(i) + 'tp.txt', 'w',  encoding="utf-8") as clusters:
             print(i)
             for tweet in tweets:
                 tags = re.findall(r"#(\w+)", tweet)
-                for tag in tags:
-                    if tag.lower() in hashtags[i]:
-                        text = common.remove_hashtag_sign(tweet)
-                        clean_texts = [wordnet_lemmatizer.lemmatize(word.lower()) for word in nltk.regexp_tokenize(text, pattern) if wordnet_lemmatizer.lemmatize(word.lower()) not in stoplist]
-                        final_text = ''
-                        for word in clean_texts:
-                            final_text += word + ' '
-                        all_tweets_in_cluster.append(final_text)
-                        clusters.write(final_text)
-                        clusters.write('\n')
-                        break
+                if len(tags) != 0:
+                    for tag in tags:
+                        if tag.lower() in hashtags[i]:
+                            text = common.cleanhtml(common.remove_hashtag_sign(common.remove_username(common.remove_url(ftfy.fix_text(tweet)))))
+                            clean_texts = [wordnet_lemmatizer.lemmatize(word.lower()) for word in nltk.regexp_tokenize(text, pattern)]
+                            final_text = ''
+                            for word in clean_texts:
+                                final_text += word + ' '
+                            all_tweets_in_cluster.append(final_text)
+                            # final_text = re.sub(r"[\u4e00-\u9fff]", "", final_text)
+                            clusters.write(final_text)
+                            clusters.write('\n')
+                            break
 
     # txt for BTM
-    with open('./intermediate_data/LDA_BTM_comparison/lda_BTM_comparison_traning_data.txt', 'w') as file:
+    with open('./intermediate_data/LDA_BTM_comparison/lda_BTM_comparison_traning_data.txt', 'w', encoding="utf-8") as file:
         for tweet in all_tweets_in_cluster:
             file.write(tweet)
             file.write('\n')
 
-    #csv for LDA
+    # csv for LDA
     fieldnames = ['clean_text']
     with open('./intermediate_data/LDA_BTM_comparison/lda_BTM_comparison_traning_data.csv', 'w', newline='', encoding='utf-8') as csv_f:
             writer = csv.DictWriter(csv_f, fieldnames=fieldnames, delimiter=',', quoting=csv.QUOTE_ALL)
@@ -102,6 +107,7 @@ def generate_tweets_by_cluster_not_gold_standard(source, k):
                 results[topic_id] = [pz_ds]
             else:
                 results[topic_id].append(pz_ds)
+
     for tp in results:
         with open('./intermediate_data/BTM/tp'+ str(k) +'_clusters/tp' + str(tp) + '.pz_d', 'w') as clusters:
             for pz_ds in results[tp]:
@@ -113,7 +119,7 @@ def generate_tweets_by_cluster_not_gold_standard(source, k):
 
 def generate_word_id(k):
     voca = {}
-    with open('./BTM/output/' + str(k) + 'tp/voca.txt', 'r') as vc:
+    with open('./Biterm/output/' + str(k) + 'tp/voca.txt', 'r', encoding='utf-8') as vc:
         for l in vc:
             wid, w = l.strip().split('\t')[:2]
             voca[w] = int(wid)
@@ -121,11 +127,11 @@ def generate_word_id(k):
     for i in range(k):
         cluster = []
         print(i)
-        with open('./intermediate_data/LDA_BTM_comparison/sample_cluster_txt/' + str(i) + 'tp.txt', 'r') as clusters:
+        with open('./intermediate_data/LDA_BTM_comparison/sample_cluster_txt/' + str(i) + 'tp.txt', 'r', encoding='utf-8') as clusters:
             for line in clusters:
                 ws = line.strip().split()
                 cluster.append(ws)
-            with open('./BTM/output/' + str(k) + 'tp/word_id_cluster/tp' + str(i)+ '_doc_wids.txt','w') as w_id:
+            with open('./Biterm/output/' + str(k) + 'tp/word_id_cluster/tp' + str(i)+ '_doc_wids.txt','w', encoding='utf-8') as w_id:
                 for tweet in cluster:
                     for w in tweet:
                         if w in voca:
@@ -144,7 +150,8 @@ def dis(di,dj):
 def calculate_h_score_worker(k):
     clusters = []
     for i in range(k):
-        # with open('./BTM/output/' + str(k) + 'tp/topics_distribution_cluster/tp' + str(i)+ '.pz_d','r') as pz_d:
+        # with open('./Biterm/output/' + str(k) + 'tp/topics_distribution_cluster/tp' + str(i)+ '.pz_d','r') as pz_d:
+        # with open('./intermediate_data/LDA_BTM_comparison/LDA/topics_distribution_cluster/' + str(i) + 'tp.txt','r') as pz_d:
         with open('./sample_clusters_for_best_number_topics/tp' + str(k) + '_clusters/tp' + str(i)+ '.pz_d','r') as pz_d:
             cluster = []
             for line in pz_d:
@@ -214,11 +221,12 @@ def to_csv(h_scores, csv_output_file):
 if __name__ == '__main__':
     start = sys.argv[1]
     end = sys.argv[2]
+    # k = 11
     #step 1 generate clusters for gold standard
-    # group_tweets_by_cluster_gold_standard('./intermediate_data/hpv_tweets/hpv_tweets_not_by_uid.txt', k)
+    # group_tweets_by_cluster_gold_standard('./intermediate_data/hpv_geotagged.csv', k)
 
-    # for k in range(5,36):
-    #     generate_tweets_by_cluster_not_gold_standard('./Biterm/output/',k)
+    for k in range(5,30):
+        generate_tweets_by_cluster_not_gold_standard('./Biterm/output/',k)
 
 
     #step 2 generate word_id for BTM

@@ -49,7 +49,7 @@ def extract_hashtag(source):
     df = pd.read_csv(source,encoding='utf-8')
     for index, row in df.iterrows():
         if '#' in row['text']:
-            text =common.cleanhtml(common.remove_username(common.remove_url(ftfy.fix_text(row['text']))))
+            text = common.cleanhtml(common.remove_username(common.remove_url(ftfy.fix_text(row['text']))))
             hastags = re.findall(r"#(\w+)", text)
             if len(hastags) != 0:
                 for tag in hastags:

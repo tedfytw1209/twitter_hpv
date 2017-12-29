@@ -1,15 +1,15 @@
 #!/bin/bash
 # run an toy example for BTM
 
-K=7   # number of topics
+K=11   # number of topics
 
 alpha=`echo "scale=3;50/$K"|bc`
 beta=0.005
 niter=5
 save_step=501
 
-input_dir=../../intermediate_data/analysis/BTM/cutoffline_annotation/
-# input_dir=../../intermediate_data/
+# input_dir=../../intermediate_data/analysis/BTM/cutoffline_annotation/
+input_dir=../output/${K}tp/
 output_dir=../output/${K}tp/
 model_dir=${output_dir}model/
 # mkdir -p $output_dir/model
@@ -19,7 +19,8 @@ model_dir=${output_dir}model/
 
 # echo "=============== Index Docs ============="
 # docs after indexing
-dwid_pt=${input_dir}word_id.txt
+dwid_pt=${input_dir}word_id_not_by_uid.txt
+# dwid_pt=${input_dir}word_id_cluster/tp10_doc_wids.txt
 # vocabulary file
 # voca_pt=${output_dir}voca.txt
 # python indexDocs.py $doc_pt $dwid_pt $voca_pt

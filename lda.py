@@ -15,9 +15,6 @@ import time
 import pandas as pd
 import ftfy
 import common
-import Arun2010
-import CaoJuan2009
-import Deveaud2014
 import csv
 import random_generate_tweets
 
@@ -392,8 +389,7 @@ if __name__ == "__main__":
     lda = gensim.models.ldamodel.LdaModel.load(MODEL)
 
     # wordcloud(lda.show_topics(num_topics=num_topics, formatted=False), './figures/%s'%(SOURCE))
-    wordcloud(topics=lda.show_topics(num_topics=num_topics, formatted=False))
-    quit()
+    # wordcloud(topics=lda.show_topics(num_topics=num_topics, formatted=False))
     # quit()
     # topics=lda.show_topics(num_topics=num_topics, num_words=10, formatted=False)
     # logger.info(topics)

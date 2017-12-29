@@ -15,14 +15,16 @@ import time
 import pandas as pd
 import common
 import csv
-from sortedcontainers import SortedDict
+import ftfy
+# from sortedcontainers import SortedDict
 
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
-
+import nltk
+from nltk.stem import WordNetLemmatizer
 
 import numpy as np
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 import random
 
@@ -30,13 +32,13 @@ import random
 # return:    {wid:w, ...}
 def read_voca(pt):
     voca = {}
-    for l in open(pt):
+    for l in open(pt, encoding='utf-8'):
         wid, w = l.strip().split('\t')[:2]
         voca[int(wid)] = w
     return voca
 
 def read_pz(pt):
-    return [float(p) for p in open(pt).readline().split()]
+    return [float(p) for p in open(pt,encoding='utf-8').readline().split()]
 
 # voca = {wid:w,...}
 def dispTopics(pt, voca, pz):
@@ -66,11 +68,13 @@ def wordcloud(topics,k):
 
         wordcloud.to_file("./intermediate_data/figures/BTM_wordcould/" + str(k) + "tp/hpv.%s.tagcloud.png"%(label))
 
-def generate_corpus_for_quality_evaluation(k,pz_d,tweets):
+
+def generate_corpus_for_quality_evaluation(k,pz_d,tweets,topic_words_distribution):
     all_tweets = []
-    with open(tweets) as f:
-        for line in f:
-            all_tweets.append(line.strip())
+    logger.info(k)
+    df = pd.read_csv(tweets,encoding='utf-8')
+    for index, row in df.iterrows():
+            all_tweets.append(row['tweets'])
 
     tweets_pz_d = []
     with open(pz_d) as f:
@@ -85,35 +89,55 @@ def generate_corpus_for_quality_evaluation(k,pz_d,tweets):
             sorted_pz_ds.sort(reverse = True)
             topic_id = tweets_pz_d[j].index(sorted_pz_ds[0])
             if topic_id not in results:
-                # results[topic_id] = [{sorted_pz_ds[0] : all_tweets[j]}]
                 results[topic_id] = [all_tweets[j]]
             else:
-                # results[topic_id].append({sorted_pz_ds[0] : all_tweets[j]})
                 results[topic_id].append(all_tweets[j])
 
-    final_result = {}
+    final_result = []
     for tp in results:
-        temp = []
-        samples_number = random.sample(range(1, len(results[tp])), 10)
-        for i in samples_number:
-            temp.append(results[tp][i])
-        final_result[tp] = temp
-    to_csv(final_result, './intermediate_data/analysis/BTM/quality_evaluation/'+str(k) + 'tp.csv')
+        for keyword in topic_words_distribution[tp][1]:
+            temp = []
+            dedup = set()
+            for tweet in results[tp]:
+                if '%s'%keyword[0] in tweet.lower():
+                    clean_text_list = (common.cleanhtml(common.remove_username(common.remove_url(ftfy.fix_text(tweet.lower()))))).strip(' ').replace('\n', ' ').split(' ')[:-1]
+                    clean_text = ",".join(str(x) for x in clean_text_list)
+                    if clean_text not in dedup:
+                        temp.append(tweet)
+                        dedup.add(clean_text)
 
-fieldnames = ['topic_id', 'clean_text']
+            # samples_number = random.sample(range(1, len(temp)), 1)
+            # if (tp == 6) and (keyword[0] == 'u.s.'):
+            #     logger.info(temp)
+            #     quit()
+
+            samples_number = []            
+            if len(temp) <= 2:
+                samples_number = range(len(temp))
+            else:
+                samples_number = random.sample(range(1, len(temp)), 2)
+            for i in samples_number:
+                result = {}
+                result['topic_id'] = tp
+                result['keyword'] = keyword[0]
+                result['propability'] = keyword[1]
+                result['tweet'] = temp[i]
+                final_result.append(result)
+
+    to_csv(final_result, '../../papers/2017_BMC_HPV/analysis/BTM/quality_evaluation/'+str(k) + 'tp.csv')
+
+fieldnames = ['topic_id', 'keyword', 'propability','tweets']
 def to_csv(results, csv_output_file):
         with open(csv_output_file, 'a', newline='', encoding='utf-8') as csv_f:
             writer = csv.DictWriter(csv_f, fieldnames=fieldnames, delimiter=',', quoting=csv.QUOTE_ALL)
             writer.writeheader()
-            # for tp in results:
-            #     for tweets in results[tp]:
-            #         writer.writerow({
-            #             'topic_id': tp,
-            #             'clean_text': tweets})
             for tweet in results:
                     writer.writerow({
                         'topic_id': tweet['topic_id'],
-                        'clean_text': tweet['clean_text']})
+                        'keyword': tweet['keyword'],
+                        'propability': tweet['propability'],
+                        'tweets': tweet['tweet']
+                        })
 
 
 def transfer_to_word_id(input_f, output_f, k):
@@ -309,32 +333,34 @@ if __name__ == "__main__":
 
     logger.info(sys.version)
 
-    # for K in range(6,7):
+    for K in range(11,12):
 
-    #     model_dir = 'Biterm/output/%dtp/model/' % K
-    #     voca_pt = 'Biterm/output/%dtp/voca.txt' % K
-    #     voca = read_voca(voca_pt)
+        model_dir = 'Biterm/output/%dtp/model/' % K
+        voca_pt = 'Biterm/output/%dtp/voca.txt' % K
+        voca = read_voca(voca_pt)
 
-    #     pz_pt = model_dir + 'k%d.pz' % K
-    #     pz = read_pz(pz_pt)
+        pz_pt = model_dir + 'k%d.pz' % K
+        pz = read_pz(pz_pt)
 
-    #     zw_pt = model_dir + 'k%d.pw_z' %  K
-    #     topics = dispTopics(zw_pt, voca, pz)
+        zw_pt = model_dir + 'k%d.pw_z' %  K
+        # topics = dispTopics(zw_pt, voca, pz)
 
-    #     tweets = 'Biterm/sample-data/hpv_tweets.txt'
-    #     pz_d = model_dir + 'k%d.pz_d' % K
+        # tweets = './intermediate_data/hpv_tweets/hpv_tweets_not_by_uid.csv'
+        tweets = './intermediate_data/hpv_tweets/hpv_tweets.txt'
+        pz_d = model_dir + 'k%d.pz_d' % K
+
         # get wordcould figures
         # wordcloud(topics, K)
 
         # generate corpus for evaluating quality of K
-        # generate_corpus_for_quality_evaluation(K,pz_d,tweets)
+        # generate_corpus_for_quality_evaluation(K,pz_d,tweets,topics)
 
     # transfer tweets txt to word id file
     # transfer_to_word_id('./intermediate_data/analysis/BTM/cutoffline_annotation/random_100.txt', './intermediate_data/analysis/BTM/cutoffline_annotation/100_doc_wids.txt', 7)
-    # transfer_to_word_id('./intermediate_data/preprocessed_text_and_geo.txt','./intermediate_data/word_id.txt',7)
+    # transfer_to_word_id('./intermediate_data/hpv_tweets/hpv_tweets_not_by_uid_BTM_input.txt','./Biterm/output/'+ str(K) +'tp/word_id_not_by_uid.txt', K)
 
     # count tweets by state
-    count_tweet_by_state('./intermediate_data/hpv_geotagged.csv')
+    # count_tweet_by_state('./intermediate_data/hpv_geotagged.csv')
 
     # test different cutoffline to count tweets
     # n = sys.argv[1]
