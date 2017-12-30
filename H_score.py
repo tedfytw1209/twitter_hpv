@@ -225,8 +225,8 @@ if __name__ == '__main__':
     #step 1 generate clusters for gold standard
     # group_tweets_by_cluster_gold_standard('./intermediate_data/hpv_geotagged.csv', k)
 
-    for k in range(5,30):
-        generate_tweets_by_cluster_not_gold_standard('./Biterm/output/',k)
+    # for k in range(2,21):
+    #     generate_tweets_by_cluster_not_gold_standard('./Biterm/output/',k)
 
 
     #step 2 generate word_id for BTM

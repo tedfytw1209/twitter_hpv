@@ -102,10 +102,10 @@ if __name__ == "__main__":
 
 
     # random generate tweets for BTM and LDA comparision
-    k = 11
-    random_generate_tweets_txt(k)
+    # k = 11
+    # random_generate_tweets_txt(k)
 
 
     # random generate pz_d for BTM
-    # for k in range(5,8):
-        # random_generate_pz_d('./intermediate_data/BTM/tp' + str(k) + '_clusters/','./sample_clusters_for_best_number_topics/tp' + str(k) + '_clusters/',k)
+    for k in range(2,21):
+        random_generate_pz_d('./intermediate_data/BTM/tp' + str(k) + '_clusters/','./sample_clusters_for_best_number_topics/tp' + str(k) + '_clusters/',k)
