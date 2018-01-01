@@ -33,7 +33,7 @@ pattern=r'[A-Z]\.+\S+|\w+\-\w+|\w+'
 
 def load_stoplist():
     stoplist = set()
-    with open('./english.stop.txt', newline='', encoding='utf-8') as f:
+    with open('./stop_words.txt', newline='', encoding='utf-8') as f:
         for line in f:
             stoplist.add(line.strip())
     return stoplist
@@ -42,7 +42,7 @@ def load_stoplist():
 def extract_clean_text(json_file):
     wv = []
     cnt = 0
-    # stoplist = load_stoplist()
+    stoplist = load_stoplist()
     wordnet_lemmatizer = WordNetLemmatizer()
     with open(json_file, 'r') as json_file:
         user_tweets = json.load(json_file)
@@ -50,7 +50,8 @@ def extract_clean_text(json_file):
             text = ''
             for tweet in user_tweets[user]:
                 text += common.cleanhtml(common.remove_hashtag_sign(common.remove_username(common.remove_url(ftfy.fix_text(tweet))))) + ' '
-            clean_texts = [wordnet_lemmatizer.lemmatize(word.lower()) for word in nltk.regexp_tokenize(text, pattern)]
+            # clean_texts = [wordnet_lemmatizer.lemmatize(word.lower()) for word in nltk.regexp_tokenize(text, pattern)] 
+            clean_texts = [wordnet_lemmatizer.lemmatize(word.lower()) for word in nltk.regexp_tokenize(text, pattern) if wordnet_lemmatizer.lemmatize(word.lower()) not in stoplist] 
             wv.append(clean_texts)
             cnt += 1
     logger.info('total tweets: %d;'%cnt)
@@ -143,8 +144,8 @@ if __name__ == "__main__":
 
 
     # extract tweets by uid
-    # wv = extract_clean_text('./intermediate_data/userid_list.json')
-    # to_txt(wv, './intermediate_data/hpv_tweets/hpv_tweets.txt')
+    wv = extract_clean_text('./intermediate_data/userid_list.json')
+    to_txt(wv, './intermediate_data/hpv_tweets/hpv_tweets.txt')
 
     # extract clean text, state info and preprocessed text
     # extract_text_for_BTM_topic_distribution('./intermediate_data/hpv_geotagged.csv', './intermediate_data/preprocessed_text_and_geo_date.csv')
