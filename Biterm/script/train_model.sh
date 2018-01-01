@@ -1,6 +1,6 @@
 #!/bin/bash
 # run an toy example for BTM
-declare -a arr=(5 10 15 20 25 30)
+declare -a arr=(5 10 15)
 for K in "${arr[@]}"
 # for K in $(seq 11 15)
 do
