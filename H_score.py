@@ -109,7 +109,7 @@ def generate_tweets_by_cluster_not_gold_standard(source, k):
                 results[topic_id].append(pz_ds)
 
     for tp in results:
-        with open('./intermediate_data/BTM/tp'+ str(k) +'_clusters/tp' + str(tp) + '.pz_d', 'w') as clusters:
+        with open('./intermediate_data/BTM/nostopwords/tp'+ str(k) +'_clusters/tp' + str(tp) + '.pz_d', 'w') as clusters:
             for pz_ds in results[tp]:
                 line = ''
                 for pz_d in pz_ds:
@@ -188,7 +188,8 @@ def calculate_h_score_worker_callback(future, final_scores = []):
     final_scores.append(h_scores)
 
 
-def calculate_h_score(start, end):
+# def calculate_h_score(start, end):
+def calculate_h_score():
     start_time = time.time()
     final_scores = []
     futures_ = []
@@ -196,7 +197,8 @@ def calculate_h_score(start, end):
     max_workers = 4
     with concurrent.futures.ProcessPoolExecutor(max_workers=max_workers) as executor:
 
-        for k in range(start,end):
+        # for k in range(start,end):
+        for k in [5,10,15]:
         # for k in [5,10,15]:
             future_ = executor.submit(calculate_h_score_worker, k)
             future_.add_done_callback(functools.partial(calculate_h_score_worker_callback, final_scores = final_scores))
@@ -219,13 +221,13 @@ def to_csv(h_scores, csv_output_file):
                     'k': score[0]})
 
 if __name__ == '__main__':
-    start = sys.argv[1]
-    end = sys.argv[2]
+    # start = sys.argv[1]
+    # end = sys.argv[2]
     # k = 11
     #step 1 generate clusters for gold standard
     # group_tweets_by_cluster_gold_standard('./intermediate_data/hpv_geotagged.csv', k)
 
-    # for k in range(2,21):
+    # for k in range(5,21):
     #     generate_tweets_by_cluster_not_gold_standard('./Biterm/output/',k)
 
 
@@ -244,4 +246,5 @@ if __name__ == '__main__':
     #     f.write('\n')
 
     #step 4 H score multi core
-    calculate_h_score(int(start),int(end))
+    # calculate_h_score(int(start),int(end))
+    calculate_h_score()
