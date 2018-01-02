@@ -215,3 +215,11 @@ yet
 http
 htt
 ht
+hpv
+gardasil
+vaccine
+cancer
+cervical
+cervicalcancer
+vaccination
+papillomavirus
