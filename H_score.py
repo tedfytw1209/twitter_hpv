@@ -152,7 +152,7 @@ def calculate_h_score_worker(k):
     for i in range(k):
         # with open('./Biterm/output/' + str(k) + 'tp/topics_distribution_cluster/tp' + str(i)+ '.pz_d','r') as pz_d:
         # with open('./intermediate_data/LDA_BTM_comparison/LDA/topics_distribution_cluster/' + str(i) + 'tp.txt','r') as pz_d:
-        with open('./sample_clusters_for_best_number_topics/tp' + str(k) + '_clusters/tp' + str(i)+ '.pz_d','r') as pz_d:
+        with open('./sample_clusters_no_stopwords/tp' + str(k) + '_clusters/tp' + str(i)+ '.pz_d','r') as pz_d:
             cluster = []
             for line in pz_d:
                 temp = []
