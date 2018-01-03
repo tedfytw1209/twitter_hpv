@@ -152,7 +152,7 @@ def calculate_h_score_worker(k):
     for i in range(k):
         # with open('./Biterm/output/' + str(k) + 'tp/topics_distribution_cluster/tp' + str(i)+ '.pz_d','r') as pz_d:
         # with open('./intermediate_data/LDA_BTM_comparison/LDA/topics_distribution_cluster/' + str(i) + 'tp.txt','r') as pz_d:
-        with open('./sample_clusters_no_stopwords/tp' + str(k) + '_clusters/tp' + str(i)+ '.pz_d','r') as pz_d:
+        with open('./sample_clusters_no_stopwords_v2/tp' + str(k) + '_clusters/tp' + str(i)+ '.pz_d','r') as pz_d:
             cluster = []
             for line in pz_d:
                 temp = []
@@ -188,8 +188,8 @@ def calculate_h_score_worker_callback(future, final_scores = []):
     final_scores.append(h_scores)
 
 
-def calculate_h_score(start, end):
-# def calculate_h_score():
+# def calculate_h_score(start, end):
+def calculate_h_score():
     start_time = time.time()
     final_scores = []
     futures_ = []
@@ -197,8 +197,8 @@ def calculate_h_score(start, end):
     max_workers = 4
     with concurrent.futures.ProcessPoolExecutor(max_workers=max_workers) as executor:
 
-        for k in range(start,end):
-        # for k in [5,10,15]:
+        # for k in range(start,end):
+        for k in [2,3,5,10,15]:
             future_ = executor.submit(calculate_h_score_worker, k)
             future_.add_done_callback(functools.partial(calculate_h_score_worker_callback, final_scores = final_scores))
             futures_.append(future_)
@@ -220,13 +220,13 @@ def to_csv(h_scores, csv_output_file):
                     'k': score[0]})
 
 if __name__ == '__main__':
-    start = sys.argv[1]
-    end = sys.argv[2]
+    # start = sys.argv[1]
+    # end = sys.argv[2]
     # k = 11
     #step 1 generate clusters for gold standard
     # group_tweets_by_cluster_gold_standard('./intermediate_data/hpv_geotagged.csv', k)
 
-    # for k in range(2,3):
+    # for k in range(30,31):
     #     generate_tweets_by_cluster_not_gold_standard('./Biterm/output/',k)
 
 
@@ -245,5 +245,5 @@ if __name__ == '__main__':
     #     f.write('\n')
 
     #step 4 H score multi core
-    calculate_h_score(int(start),int(end))
-    # calculate_h_score()
+    # calculate_h_score(int(start),int(end))
+    calculate_h_score()
