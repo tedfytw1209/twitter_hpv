@@ -198,7 +198,7 @@ def calculate_h_score():
     with concurrent.futures.ProcessPoolExecutor(max_workers=max_workers) as executor:
 
         # for k in range(start,end):
-        for k in [2,3,5,10,15]:
+        for k in [20,25,30]:
             future_ = executor.submit(calculate_h_score_worker, k)
             future_.add_done_callback(functools.partial(calculate_h_score_worker_callback, final_scores = final_scores))
             futures_.append(future_)
