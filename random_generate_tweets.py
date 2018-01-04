@@ -108,5 +108,5 @@ if __name__ == "__main__":
 
     # random generate pz_d for BTM
     # for k in range(2,3):
-    for k in [2,3,5,10,15,20,25,30]:
+    for k in [24]:
         random_generate_pz_d('./intermediate_data/BTM/nostopwords/tp' + str(k) + '_clusters/','./sample_clusters_no_stopwords_v2/tp' + str(k) + '_clusters/',k)
