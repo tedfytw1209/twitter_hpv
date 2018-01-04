@@ -1,6 +1,6 @@
 #!/bin/bash
 # run an toy example for BTM
-for K in 15 20
+for K in 26 27 28 29
 # for K in $(seq 4 5)
 do
     alpha=`echo "scale=3;1/$K"|bc`
