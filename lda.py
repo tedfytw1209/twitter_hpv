@@ -364,9 +364,9 @@ if __name__ == "__main__":
     # fix_utf8(INPUT)
     # quit()
     # Step 1: Create dictionary and corpus
-    # dictionary, corpus = load_data(INPUT, TEXT_FIELDS)
-    # dictionary.save(DICT)
-    # corpora.MmCorpus.serialize(MM, corpus)
+    dictionary, corpus = load_data(INPUT, TEXT_FIELDS)
+    dictionary.save(DICT)
+    corpora.MmCorpus.serialize(MM, corpus)
     # quit()
 
 
