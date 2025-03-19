@@ -352,10 +352,10 @@ if __name__ == "__main__":
     # BASE = './intermediate_data/laypeople/laypeople'
     # BASE = './intermediate_data/hpv_tweets/hpv_tweets'
     # BASE = './intermediate_data/promotional/promotional'
-    BASE = './intermediate_data/LDA_BTM_comparison/LDA/lda_BTM_comparison_traning_data'
+    BASE = 'transcript analysis'
     INPUT = '%s.csv'%BASE
-    TEXT_FIELDS = ['clean_text']
-    SOURCE = 'twitter'
+    TEXT_FIELDS = ['Transcript']
+    SOURCE = 'transcript'
 
 
     DICT = '%s.hpv.dict'%BASE
