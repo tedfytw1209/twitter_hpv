@@ -108,3 +108,10 @@ ENV/
 
 Poster/
 transcript analysis.csv
+*.model
+*.npy
+*.id2word
+*.state
+*.dict
+*.mm
+*.index
