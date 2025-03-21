@@ -594,3 +594,7 @@ yourself
 yourselves
 z
 zero
+yeah
+um
+uh-huh
+doe
