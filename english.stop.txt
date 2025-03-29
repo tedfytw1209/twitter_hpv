@@ -598,3 +598,6 @@ yeah
 um
 uh-huh
 doe
+kind
+thing
+yep
